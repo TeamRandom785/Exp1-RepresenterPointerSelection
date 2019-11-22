@@ -19,7 +19,3 @@ print("CUDA is ", cuda)
 device = torch.device("cuda" if cuda else "cpu")
 
 number_linear_layers = 2
-
-x = torch.tensor([1.0])
-y = (1+2.5*x).item()
-print(y)
