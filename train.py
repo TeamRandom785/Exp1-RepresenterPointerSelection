@@ -6,7 +6,7 @@ def backtracking_line_search(model, x, y, cur_loss, tau, N, lmbda):
 	grad = [model.W[i].grad for i in range(number_linear_layers)]
 	grad_all = torch.cat(grad, dim=0)
 
-	# Uniformly deacreasing the step among all the linear layers
+	# Uniformly decreasing the step among all the linear layers
 	while (t >= e-10): 
 		for i in range(number_linear_layers):
 			model.W[i] = Variable(W_init[i] - t[i]*grad[i], requires_grad = True)
