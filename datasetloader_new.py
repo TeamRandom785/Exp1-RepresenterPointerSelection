@@ -44,7 +44,7 @@ from torch.autograd import Variable
 import math
 import pickle
 import os
-dtype = torch.cuda.FloatTensor
+dtype = torch.FloatTensor
 device = torch.cuda.is_available()
 device = "cuda" if device else "cpu"
 
@@ -132,7 +132,7 @@ def backtracking_line_search(model, x, y, cur_loss, tau, N, lmbda):
 def train(model, X, Y, n_epochs, lmbda):
     x = Variable(torch.FloatTensor(X))
     y = Variable(torch.FloatTensor(Y))
-    x, y = x.to(devise), y.to(devise)
+    x, y = x.to(device), y.to(device)
 
     N = len(Y)
     min_loss = 1000000.0
