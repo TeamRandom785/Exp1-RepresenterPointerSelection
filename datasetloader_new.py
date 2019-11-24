@@ -51,6 +51,14 @@ device = "cuda" if device else "cpu"
 
 number_linear_layers = 2
 
+# calculation for softmax in torch, which avoids numerical overflow
+def softmax_torch(temp,N):
+    max_value,_ = torch.max(temp,1,keepdim = True)
+    temp = temp-max_value
+    D_exp = torch.exp(temp)
+    D_exp_sum = torch.sum(D_exp, dim=1).view(N,1)
+    return D_exp.div(D_exp_sum.expand_as(D_exp))
+
 #Defining Softmax function which is similar to Pytorch's Softmax but this Softmax function can calculate the loss
 #w.r.t loss function and also the L2 regularizer. This is used to train the pretrained model's last layer to converge
 #completely at its Global Minimum. Also, this Softmax function used LogSumTrick to handle numerical underflow 
@@ -155,6 +163,7 @@ def train(model, X, Y, n_epochs, lmbda):
 
         backtracking_line_search(model, x, y, loss.item(), 0.5, N, lmbda)
     preactivation_1 = torch.matmul(x, model.W[0])
-    return min_W_last, preactivation_1
+    # return min_W_last, preactivation_1, x, y, 
+    return x, y, N, min_W_last, preactivation_1, lmbda
 
 
