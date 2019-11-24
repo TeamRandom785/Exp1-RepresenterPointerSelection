@@ -45,7 +45,8 @@ import math
 import pickle
 import os
 dtype = torch.cuda.FloatTensor
-device = torch.device("cuda" if cuda else "cpu")
+device = torch.cuda.is_available()
+device = "cuda" if device else "cpu"
 
 
 number_linear_layers = 2
@@ -92,7 +93,7 @@ def load_data(dataset):
         print(intermediate_output_36[:5,:])
         print('done loading')
         model = softmax([W_36])
-        model.to(devise)
+        model.to(device)
         return (np.concatenate([intermediate_output_34,np.ones((intermediate_output_34.shape[0],1))],axis = 1), intermediate_output_36, model)
     
     elif dataset == "AwA":
@@ -105,7 +106,7 @@ def load_data(dataset):
         train_feature = np.concatenate([train_feature,np.ones((train_feature.shape[0],1))],axis = 1)
         train_output = softmax_np(train_output)
         model = softmax([weight])
-        model.to(devise)
+        model.to(device)
         return (train_feature,train_output,model)
 
 
