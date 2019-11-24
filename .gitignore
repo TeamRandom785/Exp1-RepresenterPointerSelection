@@ -4,3 +4,4 @@ Cifar/
 *.ipynb
 .ipynb_checkpoints/
 __pycache__/
+OldFiles/
