@@ -62,7 +62,7 @@ class softmax(nn.Module):
     #Here x is the loss function and y is the L2 regularizer
     def forward(self, x, y):
         Y = x
-        for i in range(len(self.W)):
+        for i in range(len(self.W)-1):
             Y = torch.matmul(Y, self.W[i])
             Y = torch.sigmoid(Y)
 
@@ -75,7 +75,7 @@ class softmax(nn.Module):
         tmp_var_b = torch.sum(Y*y, dim = 1)
         
         sigma = torch.sum(tmp_var_a - tmp_var_b)
-        reg_W = torch.squeeze(self.W)
+        reg_W = torch.squeeze(self.W[0])
         L2 = torch.sum(torch.mul(reg_W,reg_W))
         return (sigma,L2)
 
@@ -105,7 +105,7 @@ def load_data(dataset):
         weight = np.transpose(np.concatenate([weight,np.expand_dims(bias,1)],axis = 1))
         train_feature = np.concatenate([train_feature,np.ones((train_feature.shape[0],1))],axis = 1)
         train_output = softmax_np(train_output)
-        model = softmax([weight])
+        model = softmax([np.zeros([weight.shape[0], weight.shape[0]], dtype=np.float64), weight])
         model.to(device)
         return (train_feature,train_output,model)
 
@@ -116,12 +116,12 @@ def backtracking_line_search(model, x, y, cur_loss, tau, N, lmbda):
     t = 10.0
     W_init = [model.W[i].data for i in range(number_linear_layers)]
     grad = [model.W[i].grad for i in range(number_linear_layers)]
-    grad_all = torch.cat(grad, dim=0)
+    grad_all = torch.cat([cgrad.reshape(-1) for cgrad in grad], dim=0)
 
     # Uniformly decreasing the step among all the linear layers
-    while (t >= e-10): 
+    while (t >= 1): #e-10
         for i in range(number_linear_layers):
-            model.W[i] = Variable(W_init[i] - t[i]*grad[i], requires_grad = True)
+            model.W[i] = Variable(W_init[i] - t*grad[i], requires_grad = True)
         (Phi, L2) = model(x, y)
         loss = (Phi/N + lmbda*L2).item()
         if (cur_loss - loss >= t * torch.norm(grad_all)**2 / 2): break
@@ -154,7 +154,6 @@ def train(model, X, Y, n_epochs, lmbda):
                 break
 
         backtracking_line_search(model, x, y, loss.item(), 0.5, N, lmbda)
-
     preactivation_1 = torch.matmul(x, model.W[0])
     return min_W_last, preactivation_1
 

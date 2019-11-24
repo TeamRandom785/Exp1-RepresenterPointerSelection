@@ -5,6 +5,6 @@ import numpy as np
 
 x,y,model = load_data("AwA")
 y = y.astype(float)
-weight_matrix,pre_act = train(model,x,y,3000,0.003)
+weight_matrix,pre_act = train(model,x,y,3,0.003)
 print(weight_matrix)
 print(pre_act)
